@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 from fastapi import HTTPException, status
 
-from app.schemas.user import RegisterRequest
+from app.schemas.user import RegisterRequest, LoginRequest, TokenResponse
 from app.models.user import User
-from app.services.auth import hash_password
+from app.services.auth import hash_password, verify_password, create_access_token
 from app.schemas.user import UserResponse
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
@@ -30,4 +30,22 @@ async def register_user(user: RegisterRequest):
         username=new_user.username,
         email=new_user.email,
         created_at=new_user.created_at,
+    )
+
+
+@router.post("/login", response_model=TokenResponse)
+async def login_user(data: LoginRequest):
+    user = await User.find_one(User.email == data.email)
+    if not user:
+        raise HTTPException(status_code=400, detail="Email or password error")
+
+    password_correct = verify_password(data.password, user.hashed_password)
+    if not password_correct:
+        raise HTTPException(status_code=400, detail="Email or password error")
+
+    access_token = create_access_token({"sub": str(user.id)})
+
+    return TokenResponse(
+        access_token=access_token,
+        token_type="bearer",
     )
