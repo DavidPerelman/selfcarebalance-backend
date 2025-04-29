@@ -11,7 +11,7 @@ class MoodEntry(Document):
     emotions: List[str]  # חובה - חייב להזין רגשות
     reasons: Optional[List[str]] = None
     note: Optional[str] = None
-    created_at: datetime = Field(default_factory=datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     class Settings:
         name = "mood_entries"

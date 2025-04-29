@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 
 from app.db.init import init_db
 from app.routes.auth import router as auth_router
+from app.routes.mood import router as mood_router
 
 
 @asynccontextmanager
@@ -26,3 +27,4 @@ async def root():
 
 
 app.include_router(auth_router)
+app.include_router(mood_router)
