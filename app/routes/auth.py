@@ -55,3 +55,13 @@ async def login_user(data: LoginRequest):
 @router.get("/me")
 async def get_me(current_user: User = Depends(get_current_user)):
     return current_user
+
+
+@router.get("/private", response_model=UserResponse)
+async def private_area(current_user: User = Depends(get_current_user)):
+    return UserResponse(
+        id=str(current_user.id),
+        username=current_user.username,
+        email=current_user.email,
+        created_at=current_user.created_at,
+    )
