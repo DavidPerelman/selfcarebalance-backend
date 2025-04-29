@@ -138,3 +138,19 @@ async def update_mood_entry(
         note=mood_entry.note,
         created_at=mood_entry.created_at,
     )
+
+
+@router.delete("/{id}")
+async def delete_mood_entry(id: str, current_user: User = Depends(get_current_user)):
+    mood_entry = await MoodEntry.get(id)
+
+    if not mood_entry:
+        raise HTTPException(status_code=404, detail="Mood entry not found")
+
+    await mood_entry.fetch_link(MoodEntry.user)
+
+    if mood_entry.user.id != current_user.id:
+        raise HTTPException(status_code=403, detail="You cannot delete this mood entry")
+
+    await mood_entry.delete()
+    return {"detail": "Mood entry deleted successfully"}
