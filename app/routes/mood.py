@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, Depends
 
 from app.schemas.mood_entry import MoodEntryCreate, MoodEntryResponse
@@ -30,3 +31,20 @@ async def add_mood_entry(
         note=new_mood_entry.note,
         created_at=new_mood_entry.created_at,
     )
+
+
+@router.get("/my", response_model=List[MoodEntryResponse])
+async def get_my_moods(current_user: User = Depends(get_current_user)):
+    moods = await MoodEntry.find(MoodEntry.user.id == current_user.id).to_list()
+
+    return [
+        MoodEntryResponse(
+            id=str(mood.id),
+            mood_score=mood.mood_score,
+            emotions=mood.emotions,
+            reasons=mood.reasons,
+            note=mood.note,
+            created_at=mood.created_at,
+        )
+        for mood in moods
+    ]
