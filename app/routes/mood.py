@@ -1,7 +1,7 @@
 from typing import List
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
-from app.schemas.mood_entry import MoodEntryCreate, MoodEntryResponse
+from app.schemas.mood_entry import MoodEntryCreate, MoodEntryResponse, MoodEntryUpdate
 from app.models.user import User
 from app.models.mood_entry import MoodEntry
 from app.services.auth import get_current_user
@@ -103,3 +103,38 @@ async def get_my_moods(current_user: User = Depends(get_current_user)):
         )
         for mood in moods
     ]
+
+
+@router.put("/{id}", response_model=MoodEntryResponse)
+async def update_mood_entry(
+    id: str, mood: MoodEntryUpdate, current_user: User = Depends(get_current_user)
+):
+    mood_entry = await MoodEntry.get(id)
+
+    if not mood_entry:
+        raise HTTPException(status_code=404, detail="Mood entry not found")
+
+    await mood_entry.fetch_link(MoodEntry.user)
+
+    if mood_entry.user.id != current_user.id:
+        raise HTTPException(status_code=403, detail="You cannot edit this mood entry")
+
+    if mood.mood_score is not None:
+        mood_entry.mood_score = mood.mood_score
+    if mood.emotions is not None:
+        mood_entry.emotions = mood.emotions
+    if mood.reasons is not None:
+        mood_entry.reasons = mood.reasons
+    if mood.note is not None:
+        mood_entry.note = mood.note
+
+    await mood_entry.save()
+
+    return MoodEntryResponse(
+        id=str(mood_entry.id),
+        mood_score=mood_entry.mood_score,
+        emotions=mood_entry.emotions,
+        reasons=mood_entry.reasons,
+        note=mood_entry.note,
+        created_at=mood_entry.created_at,
+    )
