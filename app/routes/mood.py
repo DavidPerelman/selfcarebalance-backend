@@ -8,6 +8,61 @@ from app.services.auth import get_current_user
 
 router = APIRouter(prefix="/mood", tags=["Mood"])
 
+POSITIVE_EMOTIONS = [
+    "אמון",
+    "אמפתיה",
+    "אומץ",
+    "אדיבות",
+    "חשיבות עצמית",
+    "שמחה",
+    "שלווה",
+    "אהבה",
+    "התרגשות",
+    "סקרנות",
+    "תקווה",
+    "הכרת תודה",
+    "גאווה",
+    "רוגע",
+    "סיפוק",
+    "אופטימיות",
+    "השראה",
+    "הנאה",
+    "חמלה",
+    "ביטחון",
+]
+
+NEGATIVE_EMOTIONS = [
+    "עצב",
+    "כעס",
+    "פחד",
+    "בדידות",
+    "לחץ",
+    "חרדה",
+    "אכזבה",
+    "קנאה",
+    "בושה",
+    "ייאוש",
+    "עייפות",
+    "בלבול",
+    "חוסר ערך",
+    "גועל",
+    "אשמה",
+    "מבוכה",
+    "החמצה",
+    "דאגה",
+    "שנאה",
+    "תסכול",
+    "חוסר אונים",
+]
+
+
+@router.get("/emotions")
+async def get_emotions():
+    return {
+        "positive_emotions": POSITIVE_EMOTIONS,
+        "negative_emotions": NEGATIVE_EMOTIONS,
+    }
+
 
 @router.post("/add", response_model=MoodEntryResponse)
 async def add_mood_entry(
