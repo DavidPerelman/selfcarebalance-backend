@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
 from app.db.init import init_db
+from app.routes.auth import router as auth_router
 
 
 @asynccontextmanager
@@ -22,3 +23,6 @@ app = FastAPI(
 @app.get("/")
 async def root():
     return {"message": "Welcome to SelfCareBalance API!"}
+
+
+app.include_router(auth_router)
