@@ -17,3 +17,10 @@ class MoodEntryResponse(BaseModel):
     reasons: Optional[List[str]] = None
     note: Optional[str] = None
     created_at: datetime
+
+
+class MoodEntryUpdate(BaseModel):
+    mood_score: Optional[int] = Field(default=None, ge=1, le=10)
+    emotions: Optional[List[str]] = None
+    reasons: Optional[List[str]] = None
+    note: Optional[str] = None
