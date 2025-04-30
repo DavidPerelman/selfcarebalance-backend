@@ -1,5 +1,6 @@
-from typing import List
-from fastapi import APIRouter, Depends, HTTPException
+from typing import List, Optional
+from fastapi import APIRouter, Depends, HTTPException, Query
+from datetime import date, datetime
 
 from app.schemas.mood_entry import MoodEntryCreate, MoodEntryResponse, MoodEntryUpdate
 from app.models.user import User
@@ -89,8 +90,23 @@ async def add_mood_entry(
 
 
 @router.get("/my", response_model=List[MoodEntryResponse])
-async def get_my_moods(current_user: User = Depends(get_current_user)):
-    moods = await MoodEntry.find(MoodEntry.user.id == current_user.id).to_list()
+async def get_my_moods(
+    from_date: Optional[date] = Query(None, alias="from"),
+    to_date: Optional[date] = Query(None, alias="to"),
+    current_user: User = Depends(get_current_user),
+):
+    query = MoodEntry.find(MoodEntry.user.id == current_user.id)
+
+    if from_date:
+        query = query.find(
+            MoodEntry.created_at >= datetime.combine(from_date, datetime.min.time())
+        )
+    if to_date:
+        query = query.find(
+            MoodEntry.created_at <= datetime.combine(to_date, datetime.max.time())
+        )
+
+    moods = await query.to_list()
 
     return [
         MoodEntryResponse(
