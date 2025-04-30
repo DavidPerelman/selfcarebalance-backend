@@ -3,11 +3,21 @@ from pydantic import Field
 
 
 class Settings(BaseSettings):
-    mongodb_url: str
+    environment: str = Field(..., alias="ENVIRONMENT")
     secret_key: str
+    mongodb_url: str
     google_client_id: str
     google_client_secret: str
-    google_redirect_uri: str
+    google_redirect_uri_local: str
+    google_redirect_uri_prod: str
+
+    @property
+    def google_redirect_uri(self) -> str:
+        return (
+            self.google_redirect_uri_prod
+            if self.environment == "production"
+            else self.google_redirect_uri_local
+        )
 
     class Config:
         env_file = ".env"

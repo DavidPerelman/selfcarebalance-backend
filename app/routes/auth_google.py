@@ -1,11 +1,16 @@
-import os
 from fastapi import APIRouter, Request
 from authlib.integrations.starlette_client import OAuth
 from starlette.config import Config
 from fastapi.responses import RedirectResponse
 
-from app.services.google_auth import get_google_token, get_user_info
+from app.services.google_auth import (
+    get_google_token,
+    get_user_info,
+    get_or_create_user_from_google_info,
+)
 from app.core.config import settings
+from app.models.user import User
+from app.services.auth import create_access_token
 
 router = APIRouter(prefix="/auth", tags=["Auth - Google"])
 
@@ -36,4 +41,12 @@ async def login_via_google(code: str):  # noqa: F811
 
     user_info = await get_user_info(access_token)
 
-    return user_info  # שלב ביניים – נחזיר את המידע מהגוגל
+    # שמירה או יצירת משתמש ב־MongoDB
+    user = await get_or_create_user_from_google_info(user_info)
+
+    token_data = {"sub": str(user.id)}  # כמו במשתמש רגיל
+
+    # יצירת JWT עבור המשתמש (נעשה זאת בהמשך)
+    jwt_token = create_access_token(token_data)
+
+    return {"access_token": jwt_token, "token_type": "bearer"}

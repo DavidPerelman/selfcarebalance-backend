@@ -1,7 +1,7 @@
-import os
 import httpx
 from fastapi import HTTPException
 from app.core.config import settings
+from app.models.user import User
 
 
 async def get_google_token(code: str) -> dict:
@@ -33,3 +33,21 @@ async def get_user_info(access_token: str) -> dict:
             status_code=400, detail="Failed to get user info from Google"
         )
     return response.json()
+
+
+async def get_or_create_user_from_google_info(google_user_info: dict) -> User:
+    user_data = {
+        "email": google_user_info["email"],
+        "name": google_user_info["name"],
+        "picture": google_user_info.get("picture", None),  # אם יש תמונה, אחרת None
+    }
+
+    # חיפוש אם המשתמש קיים
+    existing_user = await User.find_one({"email": user_data["email"]})
+    if existing_user:
+        return existing_user  # המשתמש קיים, נחזיר אותו
+
+    # יצירת משתמש חדש
+    new_user = User(**user_data)
+    await new_user.save()
+    return new_user
