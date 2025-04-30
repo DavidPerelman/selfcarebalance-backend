@@ -3,7 +3,11 @@ from pydantic import Field
 
 
 class Settings(BaseSettings):
-    mongodb_url: str = Field(alias="MONGODB_URL")
+    mongodb_url: str
+    secret_key: str
+    google_client_id: str
+    google_client_secret: str
+    google_redirect_uri: str
 
     class Config:
         env_file = ".env"

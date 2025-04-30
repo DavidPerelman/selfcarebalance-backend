@@ -1,9 +1,12 @@
+import os
+from starlette.middleware.sessions import SessionMiddleware
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
 from app.db.init import init_db
 from app.routes.auth import router as auth_router
 from app.routes.mood import router as mood_router
+from app.routes.auth_google import router as google_auth_router
 
 
 @asynccontextmanager
@@ -26,5 +29,10 @@ async def root():
     return {"message": "Welcome to SelfCareBalance API!"}
 
 
+app.add_middleware(
+    SessionMiddleware, secret_key=os.getenv("SECRET_KEY")  # או settings.secret_key
+)
+
 app.include_router(auth_router)
 app.include_router(mood_router)
+app.include_router(google_auth_router)

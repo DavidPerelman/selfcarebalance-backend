@@ -4,6 +4,9 @@ from authlib.integrations.starlette_client import OAuth
 from starlette.config import Config
 from fastapi.responses import RedirectResponse
 
+from app.services.google_auth import get_google_token, get_user_info
+from app.core.config import settings
+
 router = APIRouter(prefix="/auth", tags=["Auth - Google"])
 
 # טוען משתני סביבה
@@ -13,8 +16,8 @@ oauth = OAuth(config)
 
 oauth.register(
     name="google",
-    client_id=os.getenv("GOOGLE_CLIENT_ID"),
-    client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
+    client_id=settings.google_client_id,
+    client_secret=settings.google_client_secret,
     server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
     client_kwargs={"scope": "openid email profile"},
 )
@@ -22,5 +25,15 @@ oauth.register(
 
 @router.get("/google/login")
 async def login_via_google(request: Request):
-    redirect_uri = os.getenv("GOOGLE_REDIRECT_URI")
+    redirect_uri = settings.google_redirect_uri
     return await oauth.google.authorize_redirect(request, redirect_uri)
+
+
+@router.get("/google/callback")
+async def login_via_google(code: str):  # noqa: F811
+    token_data = await get_google_token(code)
+    access_token = token_data["access_token"]
+
+    user_info = await get_user_info(access_token)
+
+    return user_info  # שלב ביניים – נחזיר את המידע מהגוגל
