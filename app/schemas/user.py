@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 
@@ -23,3 +24,11 @@ class LoginRequest(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+
+class MeResponse(BaseModel):
+    id: str
+    email: EmailStr
+    username: str
+    full_name: Optional[str] = None
+    profile_picture: Optional[str] = None

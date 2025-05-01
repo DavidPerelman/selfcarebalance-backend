@@ -35,19 +35,26 @@ async def get_user_info(access_token: str) -> dict:
     return response.json()
 
 
-async def get_or_create_user_from_google_info(google_user_info: dict) -> User:
+async def get_or_create_user_from_google_info(user_info: dict) -> User:
+    print(f"Received user info: {user_info}")
+
+    # בדוק אם המשתמש קיים
+    user = await User.find_one({"email": user_info["email"].lower().strip()})
+    if user:
+        print(f"User found: {user_info['email']}")
+        return user
+
+    # יצירת משתמש חדש אם לא נמצא
     user_data = {
-        "email": google_user_info["email"],
-        "name": google_user_info["name"],
-        "picture": google_user_info.get("picture", None),  # אם יש תמונה, אחרת None
+        "email": user_info["email"],
+        "username": user_info["email"],  # או שם מלא אם תרצה
+        "full_name": user_info.get("name"),
+        "profile_picture": user_info.get("picture"),
+        "is_oauth_user": True,
     }
 
-    # חיפוש אם המשתמש קיים
-    existing_user = await User.find_one({"email": user_data["email"]})
-    if existing_user:
-        return existing_user  # המשתמש קיים, נחזיר אותו
-
-    # יצירת משתמש חדש
+    print(f"Creating new user with data: {user_data}")
     new_user = User(**user_data)
-    await new_user.save()
+    await new_user.insert()
+    print(f"New user created: {new_user.email}")
     return new_user

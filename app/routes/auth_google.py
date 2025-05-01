@@ -44,9 +44,6 @@ async def login_via_google(code: str):  # noqa: F811
     # שמירה או יצירת משתמש ב־MongoDB
     user = await get_or_create_user_from_google_info(user_info)
 
-    token_data = {"sub": str(user.id)}  # כמו במשתמש רגיל
-
-    # יצירת JWT עבור המשתמש (נעשה זאת בהמשך)
-    jwt_token = create_access_token(token_data)
+    jwt_token = create_access_token({"sub": str(user.id)})
 
     return {"access_token": jwt_token, "token_type": "bearer"}

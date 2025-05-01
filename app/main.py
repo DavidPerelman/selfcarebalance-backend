@@ -7,6 +7,9 @@ from app.db.init import init_db
 from app.routes.auth import router as auth_router
 from app.routes.mood import router as mood_router
 from app.routes.auth_google import router as google_auth_router
+from app.routes.auth_info import router as auth_info_router
+
+from app.core.config import settings
 
 
 @asynccontextmanager
@@ -30,9 +33,10 @@ async def root():
 
 
 app.add_middleware(
-    SessionMiddleware, secret_key=os.getenv("SECRET_KEY")  # או settings.secret_key
+    SessionMiddleware, secret_key=settings.secret_key  # או settings.secret_key
 )
 
 app.include_router(auth_router)
 app.include_router(mood_router)
 app.include_router(google_auth_router)
+app.include_router(auth_info_router)
