@@ -24,7 +24,7 @@ class Settings(BaseSettings):
         return (
         'http://localhost:3000'
         if self.environment == "development"
-        else "https://selfcarebalance.vercel.app"
+        else "https://selfcarebalance-frontend.vercel.app"
         )
 
     class Config:
