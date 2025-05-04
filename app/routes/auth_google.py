@@ -46,4 +46,5 @@ async def login_via_google(code: str):  # noqa: F811
 
     jwt_token = create_access_token({"sub": str(user.id)})
 
-    return {"access_token": jwt_token, "token_type": "bearer"}
+    redirect_url = f"{settings.frontend_url}/auth/google/callback?token={jwt_token}"
+    return RedirectResponse(redirect_url)

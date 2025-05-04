@@ -18,6 +18,14 @@ class Settings(BaseSettings):
             if self.environment == "production"
             else self.google_redirect_uri_local
         )
+    
+    @property
+    def frontend_url(self) -> str:
+        return (
+        'http://localhost:3000'
+        if self.environment == "development"
+        else "https://selfcarebalance.vercel.app"
+        )
 
     class Config:
         env_file = ".env"
