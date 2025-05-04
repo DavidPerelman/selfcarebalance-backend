@@ -77,8 +77,9 @@
 
 ---
 
-_עודכן לאחרונה: 29 באפריל 2025_
+## הרצה
 
-.venv\Scripts\activate
-cd backend
-uvicorn app.main:app --reload
+- .venv\Scripts\activate
+- uvicorn app.main:app --reload
+
+_עודכן לאחרונה: 29 באפריל 2025_
