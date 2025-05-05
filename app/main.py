@@ -27,14 +27,13 @@ app = FastAPI(
     lifespan=lifespan,  # כאן עובר הפונקציה
 )
 
-
-@app.get("/")
-async def root():
-    return {"message": "Welcome to SelfCareBalance API!"}
+# @app.get("/")
+# async def root():
+#     return {"message": "Welcome to SelfCareBalance API!"}
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # או ["*"] רק זמנית בזמן פיתוח
+    allow_origins=["http://localhost:3000", "https://selfcarebalance-frontend.vercel.app"],  # או ["*"] רק זמנית בזמן פיתוח
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
