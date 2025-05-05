@@ -2,6 +2,7 @@ import os
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.db.init import init_db
 from app.routes.auth import router as auth_router
@@ -31,6 +32,13 @@ app = FastAPI(
 async def root():
     return {"message": "Welcome to SelfCareBalance API!"}
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # או ["*"] רק זמנית בזמן פיתוח
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.add_middleware(
     SessionMiddleware, secret_key=settings.secret_key  # או settings.secret_key
