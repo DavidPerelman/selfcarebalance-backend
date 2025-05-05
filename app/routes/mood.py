@@ -70,6 +70,7 @@ async def add_mood_entry(
     mood: MoodEntryCreate, current_user: User = Depends(get_current_user)
 ):
     new_mood_entry = MoodEntry(
+        client_id=mood.id,
         user=current_user,
         mood_score=mood.mood_score,
         emotions=mood.emotions,
@@ -178,3 +179,42 @@ async def delete_all_moods(current_user: User = Depends(get_current_user)):
     await query.delete()
 
     return {"detail": "Moods deleted successfully"}
+
+@router.post("/import", response_model=List[MoodEntryResponse])
+async def import_moods(moods: List[MoodEntryCreate], 
+                       current_user: User = Depends(get_current_user)):
+    existing = await MoodEntry.find(MoodEntry.user.id == current_user.id).to_list()
+
+    existing_ids = {entry.client_id for entry in existing}
+    new_moods = [m for m in moods if m.id not in existing_ids]
+    
+    results = []
+
+    for mood in new_moods:
+        new_entry = MoodEntry(
+            client_id=mood.id,
+            user=current_user,
+            mood_score=mood.mood_score,
+            emotions=mood.emotions,
+            reasons=mood.reasons,
+            note=mood.note,
+        )
+        await new_entry.insert()
+
+        results.append(
+            MoodEntryResponse(
+                id=str(new_entry.id),
+                mood_score=new_entry.mood_score,
+                emotions=new_entry.emotions,
+                reasons=new_entry.reasons,
+                note=new_entry.note,
+                created_at=new_entry.created_at,
+            )
+        )
+
+    return results
+
+
+
+
+

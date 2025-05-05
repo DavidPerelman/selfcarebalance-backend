@@ -4,6 +4,7 @@ from datetime import datetime
 
 
 class MoodEntryCreate(BaseModel):
+    id: str
     mood_score: int = Field(..., ge=1, le=10)
     emotions: List[str]
     reasons: Optional[List[str]] = None

@@ -6,6 +6,7 @@ from app.models.user import User
 
 
 class MoodEntry(Document):
+    client_id: str
     user: Link[User]
     mood_score: int = Field(..., ge=1, le=10)
     emotions: List[str]  # חובה - חייב להזין רגשות
