@@ -170,3 +170,11 @@ async def delete_mood_entry(id: str, current_user: User = Depends(get_current_us
 
     await mood_entry.delete()
     return {"detail": "Mood entry deleted successfully"}
+
+@router.delete("/all")
+async def delete_all_moods(current_user: User = Depends(get_current_user)):
+    query = MoodEntry.find(MoodEntry.user.id == current_user.id)
+
+    await query.delete()
+
+    return {"detail": "Moods deleted successfully"}
