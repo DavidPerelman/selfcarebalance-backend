@@ -27,9 +27,9 @@ app = FastAPI(
     lifespan=lifespan,  # כאן עובר הפונקציה
 )
 
-# @app.get("/")
-# async def root():
-#     return {"message": "Welcome to SelfCareBalance API!"}
+@app.get("/")
+async def root():
+    return {"message": "Welcome to SelfCareBalance API!"}
 
 app.add_middleware(
     CORSMiddleware,
