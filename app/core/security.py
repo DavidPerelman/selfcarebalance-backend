@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, timezone
-from config import settings
+from app.core.config import settings
 from jose import JWTError, jwt
 from fastapi import HTTPException, status
 
@@ -31,9 +31,12 @@ def verify_token(token: str) -> str:
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
+
         user_id: str = payload.get("sub")
         if user_id is None:
             raise credentials_exception
+
         return user_id
-    except JWTError:
+
+    except JWTError as e:
         raise credentials_exception
