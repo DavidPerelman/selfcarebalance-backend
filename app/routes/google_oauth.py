@@ -10,6 +10,8 @@ from app.core.security import create_access_token
 
 router = APIRouter(prefix="/auth/google", tags=["auth-google"])
 
+frontend_url = settings.frontend_url
+
 
 @router.get("/login")
 def login_with_google():
@@ -76,10 +78,5 @@ async def google_callback(request: Request):
 
     token = create_access_token({"sub": str(user.id)})
 
-    return {
-        "user_id": str(user.id),
-        "email": email,
-        "name": name,
-        "picture": picture,
-        "token": token,
-    }
+    redirect_url = f"{frontend_url}/auth/callback?access_token={token}"
+    return RedirectResponse(redirect_url)

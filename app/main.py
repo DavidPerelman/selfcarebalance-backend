@@ -3,9 +3,10 @@ from fastapi import Depends, FastAPI
 from app.db.init import init_db
 from app.core.dependencies import get_current_user
 from app.models.user import User
-from app.routes import mood, auth_debug, google_oauth
+from app.routes import mood, auth_debug, google_oauth, auth_base
 import os
 import dotenv
+from fastapi.middleware.cors import CORSMiddleware
 
 dotenv.load_dotenv()
 
@@ -21,6 +22,15 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 @app.get("/")
 def read_root():
     return {"message": "SelfCareBalance API is up!"}
@@ -33,4 +43,5 @@ async def read_current_user(user: User = Depends(get_current_user)):
 
 app.include_router(mood.router)
 app.include_router(auth_debug.router)
+app.include_router(auth_base.router)
 app.include_router(google_oauth.router)
