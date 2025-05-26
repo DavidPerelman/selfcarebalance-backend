@@ -4,7 +4,17 @@ from app.db.init import init_db
 from app.core.dependencies import get_current_user
 from app.models.user import User
 from app.routes import mood, auth_debug
+import os
+from beanie import init_beanie
+import dotenv
+from fastapi import FastAPI
+from motor.motor_asyncio import AsyncIOMotorClient
 
+from .models.user import User
+
+dotenv.load_dotenv()
+
+DB_URL = os.getenv("MONGODB_URL")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -16,6 +26,12 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 router = APIRouter()
+
+
+@app.on_event("startup")
+async def connect_to_db():
+    client = AsyncIOMotorClient(DB_URL)
+    await init_beanie(client.get_database(), document_models=[User])
 
 
 @app.get("/")
