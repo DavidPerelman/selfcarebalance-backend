@@ -6,6 +6,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import RedirectResponse
 from app.models.user import User
 from datetime import datetime
+from app.core.security import create_access_token
 
 router = APIRouter(prefix="/auth/google", tags=["auth-google"])
 
@@ -73,4 +74,12 @@ async def google_callback(request: Request):
         )
         await user.insert()
 
-    return {"user_id": str(user.id), "email": email, "name": name, "picture": picture}
+    token = create_access_token({"sub": str(user.id)})
+
+    return {
+        "user_id": str(user.id),
+        "email": email,
+        "name": name,
+        "picture": picture,
+        "token": token,
+    }
