@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, FastAPI
 from app.db.init import init_db
 from app.core.dependencies import get_current_user
 from app.models.user import User
+from app.routes import mood, auth_debug
 
 
 @asynccontextmanager
@@ -25,3 +26,7 @@ def read_root():
 @app.get("/me")
 async def read_current_user(user: User = Depends(get_current_user)):
     return {"email": user.email, "id": str(user.id)}
+
+
+app.include_router(mood.router)
+app.include_router(auth_debug.router)
