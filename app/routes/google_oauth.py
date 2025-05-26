@@ -4,6 +4,8 @@ from jose import jwt
 from app.core.config import settings
 from fastapi import APIRouter, Request
 from fastapi.responses import RedirectResponse
+from app.models.user import User
+from datetime import datetime
 
 router = APIRouter(prefix="/auth/google", tags=["auth-google"])
 
@@ -59,4 +61,16 @@ async def google_callback(request: Request):
     name = decoded_token.get("name")
     picture = decoded_token.get("picture")
 
-    return {"email": email, "name": name, "picture": picture}
+    user = await User.find_one(User.email == email)
+
+    if not user:
+        user = User(
+            email=email,
+            username=name,
+            profile_picture=picture,
+            is_oauth_user=True,
+            created_at=datetime.now(),
+        )
+        await user.insert()
+
+    return {"user_id": str(user.id), "email": email, "name": name, "picture": picture}
