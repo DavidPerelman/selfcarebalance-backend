@@ -7,6 +7,10 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     mongodb_url: str
 
+    google_client_id: str
+    google_client_secret: str
+    google_redirect_uri: str
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 

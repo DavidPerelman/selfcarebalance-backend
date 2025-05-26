@@ -1,9 +1,9 @@
 from contextlib import asynccontextmanager
-from fastapi import APIRouter, Depends, FastAPI
+from fastapi import Depends, FastAPI
 from app.db.init import init_db
 from app.core.dependencies import get_current_user
 from app.models.user import User
-from app.routes import mood, auth_debug
+from app.routes import mood, auth_debug, google_oauth
 import os
 import dotenv
 
@@ -20,8 +20,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-router = APIRouter()
-
 
 @app.get("/")
 def read_root():
@@ -35,3 +33,4 @@ async def read_current_user(user: User = Depends(get_current_user)):
 
 app.include_router(mood.router)
 app.include_router(auth_debug.router)
+app.include_router(google_oauth.router)
