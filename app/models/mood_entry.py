@@ -9,6 +9,7 @@ class MoodEntry(Document):
     user: Link[User]
     mood_score: int = Field(..., ge=1, le=10)
     emotions: List[str]
+    reasons: Optional[List[str]] = None
     note: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
